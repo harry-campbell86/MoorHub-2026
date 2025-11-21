@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 function LogoMark({ className = "" }: { className?: string }) {
   return (
@@ -33,6 +36,14 @@ const menuItems = [
 ];
 
 export function Header() {
+  const pathname = usePathname();
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    // Close the menu after navigation so it does not stay open on the new page.
+    setOpen(false);
+  }, [pathname]);
+
   return (
     <header className="w-full border-b border-[color:var(--border)] bg-white/90 shadow-sm shadow-[rgba(17,64,111,0.06)] backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10">
@@ -44,28 +55,35 @@ export function Header() {
           </div>
         </Link>
         <div className="flex items-center gap-3">
-          <details className="relative">
-            <summary className="flex cursor-pointer items-center gap-2 rounded-full border border-[color:var(--border)] px-3 py-2 text-sm font-medium text-[color:var(--ink)] shadow-sm shadow-[rgba(17,64,111,0.04)] list-none">
+          <div className="relative">
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={open}
+              onClick={() => setOpen((prev) => !prev)}
+              className="flex cursor-pointer items-center gap-2 rounded-full border border-[color:var(--border)] px-3 py-2 text-sm font-medium text-[color:var(--ink)] shadow-sm shadow-[rgba(17,64,111,0.04)]"
+            >
               <span className="hidden sm:inline">Menu</span>
-              <span className="sm:hidden text-lg" aria-label="Menu">
-                ☰
-              </span>
-              <span aria-hidden className="hidden text-[color:var(--muted)] sm:inline">
-                ▾
-              </span>
-            </summary>
-            <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-[color:var(--border)] bg-white shadow-[0_12px_30px_rgba(10,47,100,0.12)]">
+              <span className="sm:hidden text-lg" aria-label="Menu">=</span>
+              <span aria-hidden className="hidden text-[color:var(--muted)] sm:inline">?</span>
+            </button>
+            <div
+              className={`absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-[color:var(--border)] bg-white shadow-[0_12px_30px_rgba(10,47,100,0.12)] transition ${open ? "opacity-100 visible translate-y-0" : "invisible translate-y-1 opacity-0"}`}
+              role="menu"
+            >
               {menuItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
+                  onClick={() => setOpen(false)}
                   className="block px-4 py-3 text-sm text-[color:var(--ink)] transition hover:bg-[color:var(--bg-mid)] hover:text-[color:var(--accent-2)]"
+                  role="menuitem"
                 >
                   {item.label}
                 </Link>
               ))}
             </div>
-          </details>
+          </div>
         </div>
       </div>
     </header>
