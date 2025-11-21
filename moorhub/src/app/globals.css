@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-top: #f5fbfa;
+  --bg-mid: #e9f5f4;
+  --bg-bottom: #d7ecf0;
+  --ink: #063c73;
+  --muted: #47627a;
+  --surface: #ffffff;
+  --border: #c8dfe4;
+  --accent: #05a79f;
+  --accent-2: #0a2f64;
+}
+
+body {
+  color: var(--ink);
+  background: radial-gradient(60% 40% at 15% 15%, rgba(5, 167, 159, 0.08), transparent),
+    radial-gradient(50% 35% at 85% 10%, rgba(10, 47, 100, 0.08), transparent),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 45%, var(--bg-bottom) 100%);
+  min-height: 100vh;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(10, 47, 100, 0.05) 1px, transparent 0);
+  background-size: 40px 40px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(5, 167, 159, 0.2);
+  color: #062949;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
