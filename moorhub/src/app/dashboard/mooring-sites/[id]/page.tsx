@@ -19,14 +19,15 @@ export default async function MooringSiteDetailPage({ params }: { params: { id: 
   const supabase = createClient();
   const slugParam = decodeURIComponent(params.id);
 
-  const baseSelect = supabase
-    .from<MooringSiteRow>("mooring_sites")
-    .select("id, slug, name, description, address, status, account_id, updated_at");
+  // Use untyped query to avoid TS inference issues; we validate/null-check manually.
+  const baseSelect = supabase.from("mooring_sites").select("id, slug, name, description, address, status, account_id, updated_at");
 
-  const site: MooringSiteRow | null =
+  const siteRes =
     (await baseSelect.eq("slug", slugParam).maybeSingle()).data ||
     (await baseSelect.eq("id", slugParam).maybeSingle()).data ||
     (await baseSelect.ilike("slug", slugParam).maybeSingle()).data;
+
+  const site = siteRes as unknown as MooringSiteRow | null;
 
   if (!site) {
     notFound();

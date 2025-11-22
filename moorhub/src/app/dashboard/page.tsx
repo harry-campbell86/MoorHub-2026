@@ -5,13 +5,17 @@ import { createClient } from "@/lib/supabase/server";
 export default async function DashboardPage() {
   const session = await requireSession("/login");
   const email = session.user.email ?? "your account";
-  const name =
-    (session.user.user_metadata as { full_name?: string | null })?.full_name ??
-    session.user.user_metadata?.name ??
-    "";
+  const userMeta = (session.user.user_metadata ?? {}) as Record<string, unknown>;
+  const name = (userMeta.full_name as string | undefined) ?? (userMeta.name as string | undefined) ?? "";
   const supabase = createClient();
-  const profileRes = await supabase.from("consumers").select("full_name").eq("user_id", session.user.id).maybeSingle();
-  const profileName = profileRes.data?.full_name ?? name;
+  type ProfileRow = { full_name: string | null };
+  const profileRes = await supabase
+    .from("consumers")
+    .select("full_name")
+    .eq("user_id", session.user.id)
+    .maybeSingle();
+  const profileData = profileRes.data as ProfileRow | null;
+  const profileName = profileData?.full_name ?? name;
 
   return (
     <div className="space-y-4">

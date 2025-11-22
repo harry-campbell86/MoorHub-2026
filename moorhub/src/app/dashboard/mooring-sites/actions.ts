@@ -27,16 +27,19 @@ export async function updateMooringSite(_prev: ActionState, formData: FormData):
 
   const slug = slugInput || slugify(name);
 
-  const { error } = await supabase
-    .from("mooring_sites")
-    .update({
-      name,
-      description,
-      address,
-      status: status || "draft",
-      slug,
-      updated_at: new Date().toISOString(),
-    })
+  const updatePayload = {
+    name,
+    description,
+    address,
+    status: status || "draft",
+    slug,
+    updated_at: new Date().toISOString(),
+  };
+
+  // No generated types available; cast to avoid TS complaints.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("mooring_sites") as any)
+    .update(updatePayload)
     .eq("id", siteId); // RLS will enforce membership
 
   if (error) {
