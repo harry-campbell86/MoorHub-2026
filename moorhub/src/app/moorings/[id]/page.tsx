@@ -3,6 +3,15 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { FavoriteToggle } from "@/app/components/FavoriteToggle";
 
+type MooringSiteRow = {
+  id: string;
+  slug: string | null;
+  name: string;
+  description: string | null;
+  address: string | null;
+  status: string | null;
+};
+
 export default async function MooringDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
   const slugParam = decodeURIComponent(params.id);
@@ -11,14 +20,14 @@ export default async function MooringDetailPage({ params }: { params: { id: stri
 
   let data = (
     await baseSelect.eq("slug", slugParam).maybeSingle()
-  ).data;
+  ).data as MooringSiteRow | null;
 
   if (!data) {
-    data = (await baseSelect.eq("id", slugParam).maybeSingle()).data;
+    data = (await baseSelect.eq("id", slugParam).maybeSingle()).data as MooringSiteRow | null;
   }
 
   if (!data) {
-    data = (await baseSelect.ilike("slug", slugParam).maybeSingle()).data;
+    data = (await baseSelect.ilike("slug", slugParam).maybeSingle()).data as MooringSiteRow | null;
   }
 
   if (!data) {

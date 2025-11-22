@@ -2,13 +2,24 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { FavoriteToggle } from "@/app/components/FavoriteToggle";
 
+type SiteRow = {
+  id: string;
+  name: string;
+  description: string | null;
+  address: string | null;
+  status: string | null;
+  slug: string | null;
+};
+
+type FavRow = { mooring_site_id: string };
+
 type Site = {
   id: string;
   name: string;
   description: string | null;
   address: string | null;
   status: string | null;
-  slug: string;
+  slug: string | null;
 };
 
 export default async function SearchPage({
@@ -36,21 +47,22 @@ export default async function SearchPage({
     throw error;
   }
 
-  const sites: Site[] =
-    (data ?? []).map((row) => ({
-      id: row.id as string,
-      name: row.name as string,
-      description: row.description as string | null,
-      address: row.address as string | null,
-      status: row.status as string | null,
-      slug: row.slug as string,
-    })) ?? [];
+  const rows: SiteRow[] = (data ?? []) as SiteRow[];
+  const sites: Site[] = rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    address: row.address,
+    status: row.status,
+    slug: row.slug,
+  }));
 
   const favoriteIds = new Set<string>();
   if (user) {
     const favRes = await supabase.from("favorites").select("mooring_site_id").eq("user_id", user.id);
     if (!favRes.error) {
-      favRes.data?.forEach((f) => favoriteIds.add(f.mooring_site_id));
+      const favRows = (favRes.data ?? []) as FavRow[];
+      favRows.forEach((f) => favoriteIds.add(f.mooring_site_id));
     }
   }
 

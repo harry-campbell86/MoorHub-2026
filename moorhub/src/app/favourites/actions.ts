@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 
 type ActionState = { error?: string };
 
+type FavoriteRow = { id: string };
+type FavoriteInsert = { user_id: string; mooring_site_id: string };
+
 export async function toggleFavorite(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const siteId = formData.get("site_id")?.toString();
   const redirectTo = (formData.get("redirect_to")?.toString() || "/search").replace(/[\n\r]/g, "");
@@ -22,9 +25,10 @@ async function toggleFavoriteInternal(siteId?: string, redirectTo = "/search"): 
   }
 
   const session = await requireSession("/login");
-  const supabase = createClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabaseAny = createClient() as any;
 
-  const existing = await supabase
+  const existing = await supabaseAny
     .from("favorites")
     .select("id")
     .eq("user_id", session.user.id)
@@ -36,13 +40,11 @@ async function toggleFavoriteInternal(siteId?: string, redirectTo = "/search"): 
   }
 
   if (existing.data) {
-    const { error } = await supabase.from("favorites").delete().eq("id", existing.data.id);
+    const { error } = await supabaseAny.from("favorites").delete().eq("id", (existing.data as FavoriteRow).id);
     if (error) return { error: error.message };
   } else {
-    const { error } = await supabase.from("favorites").insert({
-      user_id: session.user.id,
-      mooring_site_id: siteId,
-    });
+    const insertPayload: FavoriteInsert = { user_id: session.user.id, mooring_site_id: siteId };
+    const { error } = await supabaseAny.from("favorites").insert(insertPayload);
     if (error) return { error: error.message };
   }
 
