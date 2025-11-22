@@ -47,7 +47,7 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   if (name) {
     type ConsumerInsert = { user_id: string; full_name: string | null };
     const { error: consumerError } = await supabase
-      .from<ConsumerInsert>("consumers")
+      .from<ConsumerInsert, ConsumerInsert>("consumers")
       .upsert({ user_id: user.id, full_name: name || null }, { onConflict: "user_id" });
 
     if (consumerError) {
