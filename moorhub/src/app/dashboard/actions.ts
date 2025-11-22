@@ -45,9 +45,11 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   }
 
   if (name) {
-    const { error: consumerError } = await supabase
-      .from("consumers")
-      .upsert({ user_id: user.id, full_name: name }, { onConflict: "user_id" });
+    // Using loose typing here because generated DB types are not present.
+    const { error: consumerError } = await (supabase.from("consumers") as any).upsert(
+      { user_id: user.id, full_name: name },
+      { onConflict: "user_id" }
+    );
 
     if (consumerError) {
       return { error: consumerError.message };
