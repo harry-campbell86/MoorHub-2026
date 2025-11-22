@@ -3,16 +3,27 @@ import { requireSession } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { MooringSiteForm } from "../MooringSiteForm";
 
+type MooringSiteRow = {
+  id: string;
+  slug: string | null;
+  name: string;
+  description: string | null;
+  address: string | null;
+  status: string | null;
+  account_id: string;
+  updated_at: string | null;
+};
+
 export default async function MooringSiteDetailPage({ params }: { params: { id: string } }) {
   const session = await requireSession("/login");
   const supabase = createClient();
   const slugParam = decodeURIComponent(params.id);
 
   const baseSelect = supabase
-    .from("mooring_sites")
+    .from<MooringSiteRow>("mooring_sites")
     .select("id, slug, name, description, address, status, account_id, updated_at");
 
-  const site =
+  const site: MooringSiteRow | null =
     (await baseSelect.eq("slug", slugParam).maybeSingle()).data ||
     (await baseSelect.eq("id", slugParam).maybeSingle()).data ||
     (await baseSelect.ilike("slug", slugParam).maybeSingle()).data;
