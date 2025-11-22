@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MoorHub
 
-## Getting Started
+MoorHub is a Next.js 14 application for discovering, favouriting, and managing long-stay boat moorings. It provides a marketing homepage, public mooring search, and a Supabase-backed dashboard for owners and marinas.
 
-First, run the development server:
+## Tech stack
+- **Framework:** Next.js App Router with TypeScript and React 18
+- **Styling:** Tailwind CSS with project-specific tokens in `globals.css`
+- **Data layer:** Supabase for auth, Postgres, RLS policies, and migrations (stored in `supabase/migrations`)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Getting started
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+2. **Environment variables**
+   Create a `.env.local` file with your Supabase project credentials:
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=...   # Supabase project URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=...   # Supabase anon/public key
+   ```
+3. **Database**
+   - Run Supabase locally with `supabase start` (requires the Supabase CLI) and apply migrations from `supabase/migrations`.
+   - The schema includes accounts, consumer profiles, mooring sites, and favourites with row-level security. Seed data is available in `supabase/seed_dummy_data.sql`.
+4. **Run the app**
+   ```bash
+   npm run dev
+   ```
+   Visit `http://localhost:3000` to access the UI.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project structure
+- `src/app/layout.tsx` – Global layout that wires fonts, header, and footer around all pages.
+- `src/app/page.tsx` – Marketing/landing experience for mooring discovery.
+- `src/app/search` – Public mooring search with Supabase-backed listings and favourite toggles.
+- `src/app/moorings/[id]` – Individual mooring site details fetched from Supabase.
+- `src/app/login` and `src/app/register` – Auth flows built with Supabase server actions.
+- `src/app/dashboard` – Authenticated area (requires Supabase session) for profile editing, favourites, bookings, and mooring site management.
+- `src/lib/supabase` – Thin wrappers for client/server Supabase clients that sync auth cookies.
+- `src/lib/auth` – Session helpers and server actions for sign-out and guarded routes.
+- `supabase/migrations` – Database DDL and policies; `supabase/seed_dummy_data.sql` provides starter content.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Development notes
+- Supabase types are stubbed in `src/types/supabase.ts`; generate real types with `supabase gen types typescript --project-id <id> --schema public > src/types/supabase.ts`.
+- Client components rely on the Supabase browser client for live auth state (see `Header` and `FavoriteToggle`).
+- Row-level security policies restrict access to published mooring sites for anonymous users and enforce per-user favourites.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Further reading
+See `docs/ARCHITECTURE.md` for a deeper walkthrough of routes, data flows, and auth boundaries.
