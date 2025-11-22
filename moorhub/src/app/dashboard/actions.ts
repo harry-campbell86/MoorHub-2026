@@ -45,10 +45,17 @@ export async function updateProfile(_prev: FormState, formData: FormData): Promi
   }
 
   if (name) {
-    type ConsumerInsert = { user_id: string; full_name: string | null };
-    const { error: consumerError } = await supabase
-      .from<ConsumerInsert, ConsumerInsert>("consumers")
-      .upsert({ user_id: user.id, full_name: name || null }, { onConflict: "user_id" });
+    const consumerUpsert = {
+      user_id: user.id,
+      full_name: name || null,
+    } satisfies { user_id: string; full_name: string | null };
+
+    // No generated DB types available; fall back to an untyped upsert to avoid TS errors.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: consumerError } = await (supabase.from("consumers") as any).upsert(
+      consumerUpsert,
+      { onConflict: "user_id" }
+    );
 
     if (consumerError) {
       return { error: consumerError.message };
