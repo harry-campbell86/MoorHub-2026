@@ -37,13 +37,13 @@ export default async function SearchPage({
   }
 
   const sites: Site[] =
-    data?.map((row: any) => ({
-      id: row.id,
-      name: row.name,
-      description: row.description,
-      address: row.address,
-      status: row.status,
-      slug: row.slug,
+    (data ?? []).map((row) => ({
+      id: row.id as string,
+      name: row.name as string,
+      description: row.description as string | null,
+      address: row.address as string | null,
+      status: row.status as string | null,
+      slug: row.slug as string,
     })) ?? [];
 
   const favoriteIds = new Set<string>();

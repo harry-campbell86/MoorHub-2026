@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 type ActionState = { error?: string; success?: string };
 
 export async function updateMooringSite(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const session = await requireSession("/login");
+  await requireSession("/login");
   const supabase = createClient();
 
   const siteId = formData.get("site_id")?.toString() ?? "";

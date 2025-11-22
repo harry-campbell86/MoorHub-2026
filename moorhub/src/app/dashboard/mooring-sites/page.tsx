@@ -2,17 +2,6 @@ import { requireSession } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { MooringSitesList } from "./MooringSitesList";
 
-type MooringSite = {
-  id: string;
-  slug: string | null;
-  name: string;
-  description: string | null;
-  address: string | null;
-  status: string | null;
-  account_id: string;
-  updated_at: string | null;
-};
-
 export default async function MooringSitesPage() {
   const session = await requireSession("/login");
   const supabase = createClient();

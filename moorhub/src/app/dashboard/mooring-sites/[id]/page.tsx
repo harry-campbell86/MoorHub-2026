@@ -12,7 +12,7 @@ export default async function MooringSiteDetailPage({ params }: { params: { id: 
     .from("mooring_sites")
     .select("id, slug, name, description, address, status, account_id, updated_at");
 
-  let site =
+  const site =
     (await baseSelect.eq("slug", slugParam).maybeSingle()).data ||
     (await baseSelect.eq("id", slugParam).maybeSingle()).data ||
     (await baseSelect.ilike("slug", slugParam).maybeSingle()).data;
