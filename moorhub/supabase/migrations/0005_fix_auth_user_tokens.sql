@@ -1,0 +1,1 @@
+-- noop: original attempt to alter auth.users defaults failed due to privileges.

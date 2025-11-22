@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { RegisterForm } from "./RegisterForm";
 
 export const metadata: Metadata = {
   title: "Register | MoorHub",
@@ -17,61 +18,7 @@ export default function RegisterPage() {
             One login for both sides of MoorHub: search long-stay moorings or manage your marina
             listing.
           </p>
-          <form className="space-y-4">
-            <label className="block space-y-2 text-sm text-[color:var(--muted)]">
-              <span className="font-semibold text-[color:var(--ink)]">Full name</span>
-              <input
-                className="w-full rounded-2xl border border-[color:var(--border)] px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
-                type="text"
-                name="name"
-                placeholder="Alex Skipper"
-              />
-            </label>
-            <label className="block space-y-2 text-sm text-[color:var(--muted)]">
-              <span className="font-semibold text-[color:var(--ink)]">Email</span>
-              <input
-                className="w-full rounded-2xl border border-[color:var(--border)] px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-              />
-            </label>
-            <label className="block space-y-2 text-sm text-[color:var(--muted)]">
-              <span className="font-semibold text-[color:var(--ink)]">Password</span>
-              <input
-                className="w-full rounded-2xl border border-[color:var(--border)] px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
-                type="password"
-                name="password"
-                placeholder="••••••••"
-              />
-            </label>
-            <label className="block space-y-2 text-sm text-[color:var(--muted)]">
-              <span className="font-semibold text-[color:var(--ink)]">Confirm password</span>
-              <input
-                className="w-full rounded-2xl border border-[color:var(--border)] px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
-                type="password"
-                name="confirmPassword"
-                placeholder="••••••••"
-              />
-            </label>
-            <button
-              className="w-full rounded-full bg-[color:var(--accent)] px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-[rgba(5,167,159,0.3)] transition hover:-translate-y-0.5 hover:shadow"
-              type="submit"
-            >
-              Create account
-            </button>
-            <p className="text-xs text-[color:var(--muted)]">
-              By creating an account you agree to our{" "}
-              <Link className="underline" href="/terms">
-                Terms
-              </Link>{" "}
-              and{" "}
-              <Link className="underline" href="/privacy-policy">
-                Privacy Policy
-              </Link>
-              .
-            </p>
-          </form>
+          <RegisterForm />
         </div>
         <div className="space-y-4 rounded-2xl border border-[color:var(--border)] bg-[color:var(--bg-mid)]/70 p-6">
           <h2 className="text-lg font-semibold text-[color:var(--ink)]">Already have an account?</h2>

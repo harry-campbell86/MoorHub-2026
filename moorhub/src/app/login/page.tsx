@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = {
   title: "Login | MoorHub",
@@ -17,37 +18,7 @@ export default function LoginPage() {
             Sign in to continue browsing moorings, save your boat details, or manage your marina
             listing.
           </p>
-          <form className="space-y-4">
-            <label className="block space-y-2 text-sm text-[color:var(--muted)]">
-              <span className="font-semibold text-[color:var(--ink)]">Email</span>
-              <input
-                className="w-full rounded-2xl border border-[color:var(--border)] px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-              />
-            </label>
-            <label className="block space-y-2 text-sm text-[color:var(--muted)]">
-              <span className="font-semibold text-[color:var(--ink)]">Password</span>
-              <input
-                className="w-full rounded-2xl border border-[color:var(--border)] px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
-                type="password"
-                name="password"
-                placeholder="••••••••"
-              />
-            </label>
-            <button
-              className="w-full rounded-full bg-[color:var(--accent)] px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-[rgba(5,167,159,0.3)] transition hover:-translate-y-0.5 hover:shadow"
-              type="submit"
-            >
-              Sign in
-            </button>
-            <div className="text-xs text-[color:var(--muted)]">
-              <a className="underline" href="#">
-                Forgot password?
-              </a>
-            </div>
-          </form>
+          <LoginForm />
         </div>
         <div className="space-y-4 rounded-2xl border border-[color:var(--border)] bg-[color:var(--bg-mid)]/70 p-6">
           <h2 className="text-lg font-semibold text-[color:var(--ink)]">New to MoorHub?</h2>
