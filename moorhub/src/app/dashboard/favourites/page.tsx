@@ -2,6 +2,25 @@ import { requireSession } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 
+type FavoriteRow = {
+  mooring_site_id: string;
+  mooring_sites: {
+    id: string;
+    slug: string | null;
+    name: string;
+    address: string | null;
+    status: string | null;
+  } | null;
+};
+
+type FavoriteCard = {
+  id: string;
+  slug: string | null;
+  name: string;
+  address: string | null;
+  status: string | null;
+};
+
 export default async function FavouritesPage() {
   const session = await requireSession("/login");
   const supabase = createClient();
@@ -16,15 +35,18 @@ export default async function FavouritesPage() {
     throw favRes.error;
   }
 
-  const favourites = (favRes.data ?? [])
-    .map((row) => ({
-      id: row.mooring_sites?.id,
-      slug: row.mooring_sites?.slug,
-      name: row.mooring_sites?.name,
-      address: row.mooring_sites?.address,
-      status: row.mooring_sites?.status,
-    }))
-    .filter((x) => x.id);
+  const favourites: FavoriteCard[] = (favRes.data as FavoriteRow[] | null)?.reduce((acc, row) => {
+    if (row.mooring_sites) {
+      acc.push({
+        id: row.mooring_sites.id,
+        slug: row.mooring_sites.slug,
+        name: row.mooring_sites.name,
+        address: row.mooring_sites.address,
+        status: row.mooring_sites.status,
+      });
+    }
+    return acc;
+  }, [] as FavoriteCard[]) ?? [];
 
   return (
     <div className="space-y-4">
