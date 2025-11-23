@@ -29,7 +29,7 @@ ins_users as (
     'authenticated',
     email,
     jsonb_build_object('full_name', full_name),
-    crypt('Password123!', gen_salt('bf')),
+    crypt('Password123!'::text, extensions.gen_salt('bf')::text),
     now(),
     now(),
     now()
@@ -40,6 +40,33 @@ ins_users as (
 ),
 user_map as (
   select email, id from ins_users
+),
+consumer_user_rows (email, full_name) as (
+  values
+    ('daisy.consumer@test', 'Daisy Consumer'),
+    ('ellis.boater@test', 'Ellis Boater'),
+    ('frank.marina@test', 'Frank Marina')
+),
+ins_consumer_users as (
+  insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data, encrypted_password, email_confirmed_at, created_at, updated_at)
+  select
+    gen_random_uuid(),
+    '00000000-0000-0000-0000-000000000000'::uuid,
+    'authenticated',
+    'authenticated',
+    email,
+    jsonb_build_object('full_name', full_name),
+    crypt('Password123!', gen_salt('bf')),
+    now(),
+    now(),
+    now()
+  from consumer_user_rows
+  on conflict (instance_id, email) do update
+    set raw_user_meta_data = excluded.raw_user_meta_data
+  returning email, id
+),
+consumer_user_map as (
+  select email, id from ins_consumer_users
 ),
 account_rows (name, account_type, admin_email) as (
   values
@@ -71,16 +98,19 @@ contact_rows (account_name, email, role, phone, is_admin) as (
     ('Seabird Moorings', 'quinn.sales@seabird.test', 'Sales', '555-300-0003', false)
 ),
 ins_contacts as (
-  insert into contacts (id, account_id, user_id, role, phone)
+  insert into contacts (id, account_id, user_id, role, phone, name, email)
   select
     gen_random_uuid(),
     am.id,
     um.id,
     cr.role,
-    cr.phone
+    cr.phone,
+    coalesce(ur.full_name, cr.email),
+    cr.email
   from contact_rows cr
   join account_map am on am.name = cr.account_name
   left join user_map um on um.email = cr.email
+  left join user_rows ur on ur.email = cr.email
   on conflict do nothing
   returning account_id, user_id, role, phone
 ),
@@ -106,9 +136,20 @@ select
   format('%s Site %s', am.name, gs),
   'Spacious berth with power and water hookups.',
   format('%s Harbor, Dock %s', am.name, gs),
-  50.0 + (random() * 0.5),
-  -1.0 + (random() * 0.5),
+  51.0 + (random() * 3.5), -- roughly within UK latitudes
+  -4.0 + (random() * 5.0), -- roughly within UK longitudes
   'published'
 from account_map am
 cross join generate_series(1, 10) as gs
 on conflict do nothing;
+
+-- Dummy consumers tied to auth users
+insert into consumers (id, user_id, full_name, phone)
+select
+  gen_random_uuid(),
+  cum.id,
+  cur.full_name,
+  '555-400-000' || row_number() over ()
+from consumer_user_map cum
+join consumer_user_rows cur on cur.email = cum.email
+on conflict (user_id) do nothing;

@@ -4,7 +4,6 @@ import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { signOutAction } from "@/lib/auth/actions";
 
 function LogoMark({ className = "" }: { className?: string }) {
   return (
@@ -30,7 +29,18 @@ function LogoMark({ className = "" }: { className?: string }) {
 export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
-  const [isAuthed, setIsAuthed] = React.useState(false);
+  const [role, setRole] = React.useState<"loggedOut" | "consumer" | "contact" | "admin">("loggedOut");
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  const handleLogout = React.useCallback(async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } finally {
+      setRole("loggedOut");
+      window.location.href = "/";
+    }
+  }, []);
 
   React.useEffect(() => {
     // Close the menu after navigation so it does not stay open on the new page.
@@ -39,45 +49,81 @@ export function Header() {
 
   React.useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      setIsAuthed(Boolean(data.session));
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthed(Boolean(session));
+
+    const hydrateViaApi = async () => {
+      try {
+        const res = await fetch("/api/auth/user", { cache: "no-store" });
+        if (!res.ok) {
+          setRole("loggedOut");
+          return;
+        }
+        const data = (await res.json()) as { userId: string | null; userClass: string | null };
+        if (!data.userId) {
+          setRole("loggedOut");
+        } else {
+          const mapped =
+            data.userClass === "admin"
+              ? "admin"
+              : data.userClass === "contact"
+                ? "contact"
+                : "consumer";
+          setRole(mapped);
+        }
+      } catch {
+        setRole("loggedOut");
+      }
+    };
+
+    hydrateViaApi();
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => {
+      setOpen(false);
+      if (event === "SIGNED_OUT" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION") {
+        hydrateViaApi();
+      }
     });
     return () => {
       listener.subscription.unsubscribe();
     };
   }, []);
 
-  // Re-check session on navigation to reflect server-side sign outs
   React.useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      setIsAuthed(Boolean(data.session));
-    });
-  }, [pathname]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!open) return;
+      const target = event.target as Node;
+      if (menuRef.current && !menuRef.current.contains(target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside, true);
+    return () => document.removeEventListener("mousedown", handleClickOutside, true);
+  }, [open]);
+
+  const isAuthed = role !== "loggedOut";
 
   const menuItems = React.useMemo(() => {
-    const items = [
-      { label: "Mooring search", href: "/search" },
-      ...(isAuthed ? [{ label: "Dashboard", href: "/dashboard" }] : []),
-      ...(isAuthed
-        ? []
-        : [
-            { label: "Login", href: "/login" },
-            { label: "Register", href: "/register" },
-          ]),
-      { label: "Add your marina", href: isAuthed ? "/dashboard/mooring-sites" : "/register" },
-      { label: "Privacy policy", href: "/privacy-policy" },
-      { label: "Terms", href: "/terms" },
-      { label: "Cookies", href: "/cookies" },
+    if (role === "loggedOut") {
+      return [
+        { label: "Log in", href: "/login" },
+        { label: "Register", href: "/register" },
+      ];
+    }
+
+    const profileItem = { label: "My profile", href: "/profile" };
+    if (role === "contact" || role === "admin") {
+      return [
+        profileItem,
+        { label: "Account admin", href: "/account-admin/sites" },
+      ];
+    }
+
+    return [
+      profileItem,
+      { label: "My favourites", href: "/favourites" },
     ];
-    return items;
-  }, [isAuthed]);
+  }, [role]);
 
   return (
-    <header className="w-full border-b border-[color:var(--border)] bg-white/90 shadow-sm shadow-[rgba(17,64,111,0.06)] backdrop-blur">
+    <header className="relative z-20 w-full border-b border-[color:var(--border)] bg-white/90 shadow-sm shadow-[rgba(17,64,111,0.06)] backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10">
         <Link href="/" className="flex items-center gap-3">
           <LogoMark className="h-12 w-9" />
@@ -87,7 +133,7 @@ export function Header() {
           </div>
         </Link>
         <div className="flex items-center gap-3">
-          <div className="relative">
+          <div className="relative" ref={menuRef}>
             <button
               type="button"
               aria-haspopup="menu"
@@ -96,10 +142,10 @@ export function Header() {
               className="flex cursor-pointer items-center gap-2 rounded-full border border-[color:var(--border)] px-3 py-2 text-sm font-medium text-[color:var(--ink)] shadow-sm shadow-[rgba(17,64,111,0.04)]"
             >
               <span className="hidden sm:inline">Menu</span>
-              <span className="sm:hidden text-lg" aria-label="Menu">☰</span>
+              <span className="sm:hidden text-lg" aria-label="Menu">|||</span>
             </button>
             <div
-              className={`absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-[color:var(--border)] bg-white shadow-[0_12px_30px_rgba(10,47,100,0.12)] transition ${open ? "opacity-100 visible translate-y-0" : "invisible translate-y-1 opacity-0"}`}
+              className={`absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-[color:var(--border)] bg-white shadow-[0_12px_30px_rgba(10,47,100,0.12)] transition ${open ? "opacity-100 visible translate-y-0" : "invisible translate-y-1 opacity-0"} z-30`}
               role="menu"
             >
               {menuItems.map((item) => (
@@ -114,14 +160,15 @@ export function Header() {
                 </Link>
               ))}
               {isAuthed ? (
-                <form action={signOutAction} method="post" className="border-t border-[color:var(--border)]">
+                <div className="border-t border-[color:var(--border)]">
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleLogout}
                     className="block w-full px-4 py-3 text-left text-sm font-semibold text-[color:var(--ink)] transition hover:bg-[color:var(--bg-mid)] hover:text-[color:var(--accent-2)]"
                   >
                     Log out
                   </button>
-                </form>
+                </div>
               ) : null}
             </div>
           </div>

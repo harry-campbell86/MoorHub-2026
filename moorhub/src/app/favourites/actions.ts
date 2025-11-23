@@ -49,6 +49,6 @@ async function toggleFavoriteInternal(siteId?: string, redirectTo = "/search"): 
   }
 
   revalidatePath(redirectTo);
-  revalidatePath("/dashboard/favourites");
+  revalidatePath("/favourites");
   return {};
 }

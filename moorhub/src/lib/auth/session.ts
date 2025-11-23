@@ -3,11 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function getSession() {
   const supabase = createClient();
-  const { data, error } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getUser();
   if (error) {
     return { session: null, error };
   }
-  return { session: data.session, error: null };
+  return { session: data.user ? { user: data.user } : null, error: null };
 }
 
 export async function requireSession(redirectTo = "/login") {

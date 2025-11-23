@@ -1,4 +1,6 @@
-﻿const strikes = [
+﻿import Link from "next/link";
+
+const strikes = [
   "Search moorings by marina, region, and fit for your vessel.",
   "See berth specs, pricing bands, and availability signals at a glance.",
   "Message marinas directly from MoorHub and keep your shortlists organised.",
@@ -22,47 +24,59 @@ const listings = [
     type: "Pontoon & serviced berths",
     price: "From £420 / mo",
     tags: ["Shore power", "Pump-out", "Secure access"],
-    image:
-      "https://images.unsplash.com/photo-1505761682-2ae287317ff2?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1505761682-2ae287317ff2?auto=format&fit=crop&w=1200&q=80",
     badge: "Available now",
-    distance: "City centre • Canal",
+    distance: "City centre · Canal",
   },
   {
     title: "Grand Union Moorings, Leighton Buzzard",
     type: "Residential & leisure",
     price: "From £360 / mo",
     tags: ["Wi-Fi", "Parking", "Water"],
-    image:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80",
     badge: "Few spots left",
-    distance: "Towpath access • Grand Union",
+    distance: "Towpath access · Grand Union",
   },
   {
     title: "Limehouse Basin, London",
     type: "Marina berths",
     price: "From £890 / mo",
     tags: ["Shore power", "Security", "Facilities"],
-    image:
-      "https://images.unsplash.com/photo-1518831959414-44c0b8b0c0b1?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1518831959414-44c0b8b0c0b1?auto=format&fit=crop&w=1200&q=80",
     badge: "Waitlist open",
-    distance: "Docklands • Thames link",
+    distance: "Docklands · Thames link",
   },
 ];
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-10 sm:px-10">
-        <section className="rounded-3xl border border-[color:var(--border)] bg-white p-5 shadow-[0_16px_38px_rgba(17,64,111,0.08)]">
-          <h2 className="text-lg font-semibold text-[color:var(--ink)]">Find a mooring</h2>
-          <p className="mt-1 text-sm text-[color:var(--muted)]">
-            Start with a location and a radius to see marinas and moorings nearby.
-          </p>
-          <form className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+      <section className="relative isolate overflow-hidden bg-[color:var(--bg-mid)]">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url(https://images.unsplash.com/photo-1618764268189-a6d3f1a8872f?auto=format&fit=crop&w=1600&q=80)",
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-[rgba(8,32,60,0.75)] via-[rgba(8,32,60,0.6)] to-[rgba(8,32,60,0.45)]"
+          aria-hidden="true"
+        />
+        <div className="relative mx-auto flex max-w-5xl flex-col gap-6 px-6 py-14 sm:px-10 sm:py-16">
+          <div className="max-w-2xl space-y-3 text-white">
+            <p className="text-xs uppercase tracking-[0.26em] text-[rgba(255,255,255,0.8)]">Search moorings</p>
+            <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">Find long-stay berths that fit your boat.</h1>
+            <p className="text-base text-[rgba(255,255,255,0.85)]">
+              Search by marina, region, or canal. Filter by depth, power, and availability to shortlist the right spots.
+            </p>
+          </div>
+          <form className="flex flex-col gap-3 rounded-3xl bg-white/95 p-5 shadow-[0_16px_38px_rgba(17,64,111,0.18)] backdrop-blur sm:flex-row sm:items-end sm:gap-4">
             <label className="flex-1 space-y-1 text-sm text-[color:var(--muted)]">
               <span className="font-semibold text-[color:var(--ink)]">Search location</span>
               <input
-                className="mt-1 w-full rounded-full border border-[color:var(--border)] bg-white px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
+                className="mt-1 h-12 w-full rounded-full border border-[color:var(--border)] bg-white px-4 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
                 type="text"
                 placeholder="City, marina, canal, or region"
                 name="location"
@@ -71,7 +85,7 @@ export default function Home() {
             <label className="w-full space-y-1 text-sm text-[color:var(--muted)] sm:w-44">
               <span className="font-semibold text-[color:var(--ink)]">Radius</span>
               <select
-                className="mt-1 w-full rounded-full border border-[color:var(--border)] bg-white px-4 py-3 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
+                className="mt-1 h-12 w-full rounded-full border border-[color:var(--border)] bg-white px-4 text-[color:var(--ink)] shadow-inner shadow-[rgba(17,64,111,0.04)] focus:border-[color:var(--accent)] focus:outline-none"
                 name="radius"
                 defaultValue="25"
               >
@@ -83,14 +97,16 @@ export default function Home() {
               </select>
             </label>
             <button
-              className="w-full rounded-full bg-[color:var(--accent)] px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-[rgba(30,124,200,0.3)] transition hover:-translate-y-0.5 hover:shadow sm:w-auto"
+              className="h-12 w-full rounded-full bg-[color:var(--accent)] px-5 text-sm font-semibold text-white shadow-sm shadow-[rgba(30,124,200,0.3)] transition hover:-translate-y-0.5 hover:shadow sm:w-auto"
               type="button"
             >
               Search moorings
             </button>
           </form>
-        </section>
+        </div>
+      </section>
 
+      <div className="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-10 sm:px-10">
         <section className="space-y-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -102,9 +118,12 @@ export default function Home() {
                 Browse marinas and canal moorings like a property search—photos, prices, and fit for your vessel.
               </p>
             </div>
-            <button className="rounded-full bg-[color:var(--accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-[rgba(5,167,159,0.3)]">
+            <Link
+              href="/search"
+              className="rounded-full bg-[color:var(--accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-[rgba(5,167,159,0.3)]"
+            >
               View all moorings
-            </button>
+            </Link>
           </div>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {listings.map((listing) => (
@@ -131,7 +150,10 @@ export default function Home() {
                   <p className="text-sm text-[color:var(--muted)]">{listing.distance}</p>
                   <div className="flex flex-wrap gap-2 pt-2 text-xs text-[color:var(--muted)]">
                     {listing.tags.map((tag) => (
-                      <span key={tag} className="rounded-full border border-[color:var(--border)] px-3 py-1 bg-[color:var(--bg-mid)]/40">
+                      <span
+                        key={tag}
+                        className="rounded-full border border-[color:var(--border)] px-3 py-1 bg-[color:var(--bg-mid)]/40"
+                      >
                         {tag}
                       </span>
                     ))}
@@ -219,7 +241,9 @@ export default function Home() {
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--accent-2)]">Ready to start?</p>
               <h3 className="mt-2 text-xl font-semibold text-[color:var(--ink)]">Tell us your boat or add your marina listing.</h3>
-              <p className="mt-2 max-w-2xl text-[color:var(--muted)]">We will onboard you in a quick call and make sure your details are live and easy to find.</p>
+              <p className="mt-2 max-w-2xl text-[color:var(--muted)]">
+                We will onboard you in a quick call and make sure your details are live and easy to find.
+              </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <button className="rounded-full bg-[color:var(--accent)] px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-[rgba(30,124,200,0.35)]">
@@ -235,15 +259,3 @@ export default function Home() {
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-

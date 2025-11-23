@@ -75,6 +75,8 @@ create table if not exists contacts (
   user_id uuid references auth.users (id) on delete set null,
   role text,
   phone text,
+  name text,
+  email text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
